@@ -57,12 +57,12 @@ public class StudentController {
 	
 	@PostMapping("/student")
 	@Transactional
-	public void postStudent ( @RequestParam("email") String email, @RequestParam("name") String name ) {
+	public Student postStudent ( @RequestParam("email") String email, @RequestParam("name") String name ) {
 		System.out.println("/student called.");
 		
 		Student student = studentRepository.findByEmail(email);
-		if (student == null) {
-			System.out.println("/student POST unsuccessful! Already exists: "+student.getName()+" "+student.getStudent_id());
+		if (student != null) {
+			System.out.println("/student POST unsuccessful! Already exists: "+email);
 			throw  new ResponseStatusException( HttpStatus.BAD_REQUEST, "Student already exists. " );
 		}else if (email == null || name == null) {
 			System.out.println("/student POST unsuccessful! Bad parameters.");
@@ -75,6 +75,8 @@ public class StudentController {
 			studentRepository.save(s);
 			
 			System.out.println("/student POST successful! Registered: " + email + " " + name);
+			
+			return s;
 		}
 	}
 	
