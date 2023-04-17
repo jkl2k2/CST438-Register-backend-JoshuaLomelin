@@ -23,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.cst438.controller.StudentController;
 import com.cst438.controller.ScheduleController;
 import com.cst438.domain.Course;
 import com.cst438.domain.CourseRepository;
@@ -49,7 +50,7 @@ import org.springframework.test.context.ContextConfiguration;
  *  addFilters=false turns off security.  (I could not get security to work in test environment.)
  *  WebMvcTest is needed for test environment to create Repository classes.
  */
-@ContextConfiguration(classes = { ScheduleController.class })
+@ContextConfiguration(classes = { ScheduleController.class, StudentController.class })
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest
 public class JunitTestSchedule {
@@ -60,6 +61,8 @@ public class JunitTestSchedule {
 	public static final String TEST_STUDENT_NAME  = "test";
 	public static final int TEST_YEAR = 2021;
 	public static final String TEST_SEMESTER = "Fall";
+	public static final String NEW_TEST_STUDENT_EMAIL = "junit@csumb.edu";
+	public static final String NEW_TEST_STUDENT_NAME = "Jay Unit";
 
 	@MockBean
 	CourseRepository courseRepository;
@@ -76,6 +79,59 @@ public class JunitTestSchedule {
 	@Autowired
 	private MockMvc mvc;
 
+	@Test
+	public void addStudentSuccessful() throws Exception {
+		MockHttpServletResponse response;
+		
+		response = mvc.perform(
+				MockMvcRequestBuilders
+			      .post("/student" + "?email=" + NEW_TEST_STUDENT_EMAIL + "&name=" + NEW_TEST_STUDENT_NAME)
+			      .accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse();
+		
+		// verify that return status = OK (value 200) 
+		assertEquals(200, response.getStatus());
+				
+		// verify that repository save method was called.
+		verify(studentRepository).save(any(Student.class));
+	}
+	
+	@Test
+	public void putHoldOnStudent() throws Exception {
+		MockHttpServletResponse response;
+		
+		response = mvc.perform(
+				MockMvcRequestBuilders
+			      .post("/student" + "?email=dwisneski@csumb.edu&name=david")
+			      .accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse();
+		
+		studentRepository.save(fromJsonString(response.getContentAsString(), Student.class));
+		
+		response = mvc.perform(
+				MockMvcRequestBuilders
+			      .post("/student/holds" + "?email=" + TEST_STUDENT_EMAIL + "&hold=" + true)
+			      .accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse();
+		
+		// verify that return status = OK (value 200) 
+		assertEquals(200, response.getStatus());
+	}
+	
+	@Test
+	public void removeHoldOnStudent() throws Exception {
+		MockHttpServletResponse response;
+		
+		response = mvc.perform(
+				MockMvcRequestBuilders
+			      .post("/student/holds" + "?email=" + TEST_STUDENT_EMAIL + "&hold=" + false)
+			      .accept(MediaType.APPLICATION_JSON))
+				.andReturn().getResponse();
+		
+		// verify that return status = OK (value 200) 
+		assertEquals(200, response.getStatus());
+	}
+	
 	@Test
 	public void addCourse()  throws Exception {
 		
@@ -128,6 +184,8 @@ public class JunitTestSchedule {
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .accept(MediaType.APPLICATION_JSON))
 				.andReturn().getResponse();
+		
+		System.out.println(asJsonString(courseDTO));
 		
 		// verify that return status = OK (value 200) 
 		assertEquals(200, response.getStatus());
