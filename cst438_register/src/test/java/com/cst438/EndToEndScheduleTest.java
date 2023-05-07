@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -38,7 +38,7 @@ import com.cst438.domain.EnrollmentRepository;
 @SpringBootTest
 public class EndToEndScheduleTest {
 
-	public static final String CHROME_DRIVER_FILE_LOCATION = "C:/chromedriver_win32/chromedriver.exe";
+	public static final String FIREFOX_DRIVER_FILE_LOCATION = "C:/Users/joshu/Desktop/CST438/geckodriver.exe";
 
 	public static final String URL = "http://localhost:3000";
 
@@ -87,8 +87,8 @@ public class EndToEndScheduleTest {
 		// IE 		webdriver.ie.driver 		InternetExplorerDriver
 		//@formatter:on
 
-		System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_FILE_LOCATION);
-		WebDriver driver = new ChromeDriver();
+		System.setProperty("webdriver.gecko.driver", FIREFOX_DRIVER_FILE_LOCATION);
+		WebDriver driver = new FirefoxDriver();
 		// Puts an Implicit wait for 10 seconds before throwing exception
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
